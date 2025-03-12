@@ -5,9 +5,12 @@ using UnityEngine;
 public class Container : MonoBehaviour
 {
     [SerializeField] private GameObject leftWall;
+    public GameObject LeftWall { get => leftWall; }
     [SerializeField] private GameObject rightWall;
     [SerializeField] private GameObject topWall;
+    public GameObject TopWall { get => topWall; }
     [SerializeField] private GameObject bottomWall;
+    public GameObject BottomWall { get => bottomWall; }
 
     [SerializeField] private GameObject containerHandle;
 

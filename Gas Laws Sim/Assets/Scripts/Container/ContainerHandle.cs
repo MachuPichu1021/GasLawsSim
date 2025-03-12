@@ -9,6 +9,9 @@ public class ContainerHandle : MonoBehaviour
 
     [SerializeField] private Transform topLeftCorner;
     [SerializeField] private Transform bottomRightCorner;
+    [SerializeField] private GameObject ghostTopWall;
+    [SerializeField] private GameObject ghostBottomWall;
+    [SerializeField] private GameObject ghostLeftWall;
 
     private void OnMouseDown()
     {
@@ -27,6 +30,11 @@ public class ContainerHandle : MonoBehaviour
 
     private void OnMouseUp()
     {
+        ghostLeftWall.transform.position = container.LeftWall.transform.position;
+        ghostTopWall.transform.position = container.TopWall.transform.position;
+        ghostTopWall.transform.localScale = container.TopWall.transform.localScale;
+        ghostBottomWall.transform.position = container.BottomWall.transform.position;
+        ghostBottomWall.transform.localScale = container.BottomWall.transform.localScale;
         GasParticle[] gasParticles = FindObjectsByType<GasParticle>(FindObjectsSortMode.None);
         foreach (GasParticle particle in gasParticles)
         {
