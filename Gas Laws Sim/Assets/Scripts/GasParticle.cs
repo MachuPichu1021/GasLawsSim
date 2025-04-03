@@ -15,6 +15,12 @@ public class GasParticle : MonoBehaviour
         rb.velocity = direction * speed;
     }
 
+    private void Update()
+    {
+        if (GasManager.instance.Temperature != 0)
+            rb.velocity = 0.01f * GasManager.instance.Temperature * rb.velocity.normalized;
+    }
+
     public void Freeze()
     {
         direction = rb.velocity.normalized;

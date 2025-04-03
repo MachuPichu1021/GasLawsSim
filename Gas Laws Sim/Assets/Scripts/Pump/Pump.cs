@@ -12,7 +12,10 @@ public class Pump : MonoBehaviour
         if (collision.CompareTag("Handle"))
         {
             for (int i = 0; i < 5; i++)
+            {
                 Instantiate(particlePrefab, particleSpawnPos.position, Quaternion.identity);
+                GasManager.instance.IncreaseParticleCount(5);
+            }
         }
     }
 }
