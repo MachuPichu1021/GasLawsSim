@@ -22,7 +22,7 @@ public class ContainerHandle : MonoBehaviour
 
     private void OnMouseDrag()
     {
-        transform.Translate(Vector2.right * Input.GetAxis("Mouse X") * sensitivity);
+        transform.Translate(Input.GetAxis("Mouse X") * sensitivity * Vector2.right);
         float clampedXPos = Mathf.Clamp(transform.localPosition.x, -8.5f, -3);
         transform.localPosition = new Vector2(clampedXPos, transform.localPosition.y);
         container.Resize();
