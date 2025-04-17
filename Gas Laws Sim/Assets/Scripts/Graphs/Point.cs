@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
@@ -11,6 +12,8 @@ public class Point : MonoBehaviour, IPointerEnterHandler, IPointerMoveHandler, I
 
     private DataPoint data;
     public DataPoint Data { set => data = value; }
+
+    private bool isHighlighted;
 
     public void OnPointerEnter(PointerEventData pointerEventData)
     {
@@ -26,5 +29,15 @@ public class Point : MonoBehaviour, IPointerEnterHandler, IPointerMoveHandler, I
     public void OnPointerExit(PointerEventData pointerEventData)
     {
         Destroy(tooltipReference);
+    }
+
+    public void ToggleHighlight()
+    {
+        Image image = GetComponent<Image>();
+        if (!isHighlighted)
+            image.color = Color.green;
+        else
+            image.color = Color.red;
+        isHighlighted ^= true;
     }
 }

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public struct DataPoint
 {
@@ -16,6 +18,11 @@ public struct DataPoint
         volume = _volume;
         temperature = _temp;
         pressure = _pressure;
+    }
+
+    public bool Equals(DataPoint other)
+    {
+        return volume == other.volume && temperature == other.temperature && pressure == other.pressure;
     }
 }
 
@@ -35,6 +42,9 @@ public class GraphManager : MonoBehaviour
     [SerializeField] private GameObject dataPointPrefab;
     [SerializeField] private RectTransform graphBG;
     private GraphType graphType = GraphType.PRESSURE_VS_VOLUME;
+
+    [SerializeField] private Transform table;
+    [SerializeField] private GameObject tableDataPrefab;
 
     private const float maxVolume = 45000;
     private const float maxTemp = 5000;
@@ -72,6 +82,10 @@ public class GraphManager : MonoBehaviour
             }
             dataPoint.transform.localPosition = new Vector2(xPos, yPos);
             dataPoint.Data = point;
+
+            GameObject tableData = Instantiate(tableDataPrefab, table);
+            tableData.GetComponentInChildren<Button>().onClick.AddListener(() => dataPoint.ToggleHighlight());
+            tableData.GetComponentInChildren<TMP_Text>().text = $"V: {point.Volume:0.00} mL\nT: {point.Temperature:0.00} K\nP: {point.Pressure:0.00} kPa";
         }
     }
 
@@ -80,6 +94,8 @@ public class GraphManager : MonoBehaviour
         GameObject[] points = GameObject.FindGameObjectsWithTag("Data");
         foreach (GameObject point in points)
             Destroy(point);
+        foreach (Transform child in table)
+            Destroy(child.gameObject);
     }
 
 
@@ -97,7 +113,8 @@ public class GraphManager : MonoBehaviour
     public void AddDataPoint(float currentVol, float currentTemp, float currentPressure)
     {
         DataPoint dataPoint = new DataPoint(currentVol, currentTemp, currentPressure);
-        data.Add(dataPoint);
+        if (!data.Contains(dataPoint))
+            data.Add(dataPoint);
     }
     
     public void ClearData()
