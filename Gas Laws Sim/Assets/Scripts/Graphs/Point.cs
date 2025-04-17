@@ -14,7 +14,7 @@ public class Point : MonoBehaviour, IPointerEnterHandler, IPointerMoveHandler, I
 
     public void OnPointerEnter(PointerEventData pointerEventData)
     {
-        tooltipReference = Instantiate(tooltipPrefab, transform);
+        tooltipReference = Instantiate(tooltipPrefab, transform.parent);
         tooltipReference.GetComponentInChildren<TMP_Text>().text = $"V: {data.Volume:0.00} mL\nT: {data.Temperature:0.00} K\nP: {data.Pressure:0.00} kPa";
     }
 
