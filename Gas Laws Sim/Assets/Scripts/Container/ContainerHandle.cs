@@ -13,8 +13,17 @@ public class ContainerHandle : MonoBehaviour
     [SerializeField] private GameObject ghostBottomWall;
     [SerializeField] private GameObject ghostLeftWall;
 
+    private void OnEnable()
+    {
+        transform.position = new Vector2(container.LeftWall.transform.position.x - 0.625f, transform.position.y);
+    }
+
     private void OnMouseDown()
     {
+        ghostLeftWall.SetActive(true);
+        ghostTopWall.SetActive(true);
+        ghostBottomWall.SetActive(true);
+        container.LeftWall.GetComponent<Collider2D>().enabled = false;
         GasParticle[] gasParticles = FindObjectsByType<GasParticle>(FindObjectsSortMode.None);
         foreach (GasParticle particle in gasParticles)
             particle.Freeze();
@@ -30,11 +39,15 @@ public class ContainerHandle : MonoBehaviour
 
     private void OnMouseUp()
     {
+        ghostLeftWall.SetActive(false);
+        ghostTopWall.SetActive(false);
+        ghostBottomWall.SetActive(false);
         ghostLeftWall.transform.position = container.LeftWall.transform.position;
         ghostTopWall.transform.position = container.TopWall.transform.position;
         ghostTopWall.transform.localScale = container.TopWall.transform.localScale;
         ghostBottomWall.transform.position = container.BottomWall.transform.position;
         ghostBottomWall.transform.localScale = container.BottomWall.transform.localScale;
+        container.LeftWall.GetComponent<Collider2D>().enabled = true;
         GasParticle[] gasParticles = FindObjectsByType<GasParticle>(FindObjectsSortMode.None);
         foreach (GasParticle particle in gasParticles)
         {

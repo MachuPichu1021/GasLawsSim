@@ -30,9 +30,6 @@ public class GasManager : MonoBehaviour
     private const float gasConstant = 8.314f;
     private int particleCount = 0;
 
-    [SerializeField] private Transform topLeftCorner;
-    [SerializeField] private Transform bottomRightCorner;
-
     [SerializeField] private TMP_Text volumeText;
     [SerializeField] private TMP_Text pressureText;
     [SerializeField] private TMP_Text tempText;
@@ -41,6 +38,14 @@ public class GasManager : MonoBehaviour
     [SerializeField] private GameObject tempSlider;
 
     [SerializeField] private Button dataPointButton;
+
+    [SerializeField] private Button unlockButton;
+    [SerializeField] private Button lockVolumeButton;
+    [SerializeField] private Button lockTempButton;
+    [SerializeField] private Button lockPressureWRTVolButton;
+    [SerializeField] private Button lockPressureWRTTempButton;
+
+    private Container container;
 
     private void Awake()
     {
@@ -53,22 +58,39 @@ public class GasManager : MonoBehaviour
     private void Start()
     {
         dataPointButton.onClick.AddListener(() => GraphManager.instance.AddDataPoint(volume, temperature, pressure));
+
+        unlockButton.onClick.AddListener(() => SetLockState(SimLockState.NONE));
+        lockVolumeButton.onClick.AddListener(() => SetLockState(SimLockState.VOLUME));
+        lockTempButton.onClick.AddListener(() => SetLockState(SimLockState.TEMP));
+        lockPressureWRTVolButton.onClick.AddListener(() => SetLockState(SimLockState.PRESSURE_VOL));
+        lockPressureWRTTempButton.onClick.AddListener(() => SetLockState(SimLockState.PRESSURE_TEMP));
+
+        container = FindObjectOfType<Container>();
     }
 
     private void Update()
     {
+        lockTempButton.interactable = particleCount != 0;
+        lockPressureWRTVolButton.interactable = particleCount != 0;
+        lockPressureWRTTempButton.interactable = particleCount != 0;
+
         if (lockState == SimLockState.NONE || lockState == SimLockState.TEMP || lockState == SimLockState.VOLUME)
         {
-            volume = 1000 * Mathf.Abs(topLeftCorner.position.x - bottomRightCorner.position.x) * Mathf.Abs(topLeftCorner.position.y - bottomRightCorner.position.y);
+            volume = 1000 * Mathf.Abs(container.LeftWall.transform.position.x - container.RightWall.transform.position.x) * 
+                Mathf.Abs(container.TopWall.transform.position.y - container.BottomWall.transform.position.y);
             pressure = (particleCount * gasConstant * temperature) / volume;
         }
         else if (lockState == SimLockState.PRESSURE_TEMP)
         {
-            volume = 1000 * Mathf.Abs(topLeftCorner.position.x - bottomRightCorner.position.x) * Mathf.Abs(topLeftCorner.position.y - bottomRightCorner.position.y);
+            volume = 1000 * Mathf.Abs(container.LeftWall.transform.position.x - container.RightWall.transform.position.x) *
+                Mathf.Abs(container.TopWall.transform.position.y - container.BottomWall.transform.position.y);
             temperature = (pressure * volume) / (particleCount * gasConstant);
         }
         else if (lockState == SimLockState.PRESSURE_VOL)
+        {
             volume = (particleCount * gasConstant * temperature) / pressure;
+            container.Resize(volume);
+        }
 
         volumeText.text = $"Volume: {volume:0.00} mL";
         pressureText.text = particleCount != 0 ? $"Pressure: {pressure:0.00} kPa" : "Pressure: ---";
