@@ -1,7 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.U2D;
 using TMPro;
 
 public struct DataPoint
@@ -50,6 +50,9 @@ public class GraphManager : MonoBehaviour
     private const float maxTemp = 5000;
     private const float maxPressure = 200;
 
+    [SerializeField] private LineRenderer lineRenderer;
+    private const int numPoints = 100;
+
     private void Awake()
     {
         if (instance == null)
@@ -58,8 +61,15 @@ public class GraphManager : MonoBehaviour
             Destroy(gameObject);
     }
 
+    private void Start()
+    {
+        lineRenderer.positionCount = numPoints;
+    }
+
     public void DisplayGraph()
     {
+        lineRenderer.positionCount = data.Count;
+        Vector3[] positions = new Vector3[data.Count];
         foreach (DataPoint point in data)
         {
             Point dataPoint = Instantiate(dataPointPrefab, graphBG).GetComponent<Point>();
@@ -84,7 +94,9 @@ public class GraphManager : MonoBehaviour
             dataPoint.Data = point;
 
             GameObject tableData = Instantiate(tableDataPrefab, table);
-            tableData.GetComponentInChildren<Button>().onClick.AddListener(() => dataPoint.ToggleHighlight());
+            Button[] buttons = tableData.GetComponentsInChildren<Button>();
+            buttons[0].onClick.AddListener(() => dataPoint.ToggleHighlight());
+            buttons[1].onClick.AddListener(() => { DeletePoint(point, dataPoint); Destroy(tableData); });
             tableData.GetComponentInChildren<TMP_Text>().text = $"V: {point.Volume:0.00} mL\nT: {point.Temperature:0.00} K\nP: {point.Pressure:0.00} kPa";
         }
     }
@@ -117,8 +129,88 @@ public class GraphManager : MonoBehaviour
             data.Add(dataPoint);
     }
     
+    private void DeletePoint(DataPoint data, Point point)
+    {
+        Destroy(point.gameObject);
+        this.data.Remove(data);
+    }
+
     public void ClearData()
     {
         data.Clear();
     }
+
+    public void RenderLine()
+    {
+        Vector3[] positions = new Vector3[numPoints];
+        for (int i = 1; i <= numPoints; i++)
+        {
+            float xPos = -(graphBG.rect.width / 2);
+            float yPos = -(graphBG.rect.height / 2);
+            float vol, temp, pressure;
+            switch (graphType)
+            {
+                case GraphType.PRESSURE_VS_VOLUME:
+                    vol = maxVolume * i / numPoints;
+                    xPos += graphBG.rect.width * (vol / maxVolume);
+                    pressure = GasManager.instance.CalculatePressureVolConst(vol);
+                    yPos += graphBG.rect.height * (pressure / maxPressure);
+                    break;
+                case GraphType.VOLUME_VS_TEMPERATURE:
+                    temp = maxTemp * i / numPoints;
+                    xPos += graphBG.rect.width * (temp / maxTemp);
+                    vol = GasManager.instance.CalculateVolume(temp);
+                    yPos += graphBG.rect.height * (vol / maxVolume);
+                    break;
+                case GraphType.PRESSURE_VS_TEMPERATURE:
+                    temp = maxTemp * i / numPoints;
+                    xPos += graphBG.rect.width * (temp / maxTemp);
+                    pressure = GasManager.instance.CalculatePressureTempConst(temp);
+                    yPos += graphBG.rect.height * (pressure / maxPressure);
+                    break;
+            }
+            positions[i - 1] = new Vector3(xPos, yPos);
+        }
+        lineRenderer.SetPositions(positions);
+        lineRenderer.gameObject.SetActive(true);
+    }
+
+    /*public void SampleSplineAndRender(Spline spline)
+    {
+        lineRenderer.positionCount = numPoints;
+        Vector3[] points = new Vector3[numPoints];
+
+        for (int i = 0; i < numPoints; i++)
+        {
+            float t = (float)i / (numPoints - 1);
+            points[i] = GetPoint(spline, t);
+        }
+
+        lineRenderer.SetPositions(points);
+    }
+
+    private static Vector2 GetPoint(Spline spline, float progress)
+    {
+        int length = spline.GetPointCount();
+        int i = Mathf.Clamp(Mathf.CeilToInt((length - 1) * progress), 0, length - 1);
+
+        float t = progress * (length - 1) % 1f;
+        if (i == length - 1 && progress >= 1f)
+            t = 1;
+
+        int prevIndex = Mathf.Max(i - 1, 0);
+
+        Vector2 _p0 = new Vector2(spline.GetPosition(prevIndex).x, spline.GetPosition(prevIndex).y);
+        Vector2 _p1 = new Vector2(spline.GetPosition(i).x, spline.GetPosition(i).y);
+        Vector2 _rt = _p0 + new Vector2(spline.GetRightTangent(prevIndex).x, spline.GetRightTangent(prevIndex).y);
+        Vector2 _lt = _p1 + new Vector2(spline.GetLeftTangent(i).x, spline.GetLeftTangent(i).y);
+
+        return BezierUtility.BezierPoint(
+           new Vector2(_rt.x, _rt.y),
+           new Vector2(_p0.x, _p0.y),
+           new Vector2(_p1.x, _p1.y),
+           new Vector2(_lt.x, _lt.y),
+           t
+        );
+    }*/
 }

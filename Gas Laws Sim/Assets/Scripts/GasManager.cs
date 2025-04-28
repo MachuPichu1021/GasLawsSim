@@ -100,6 +100,19 @@ public class GasManager : MonoBehaviour
             DestroyAllParticles();
     }
 
+    public float CalculateVolume(float temp)
+    {
+        return particleCount * gasConstant * temp / pressure;
+    }
+    public float CalculatePressureTempConst(float temp)
+    {
+        return particleCount * gasConstant * temp / volume;
+    }
+    public float CalculatePressureVolConst(float vol)
+    {
+        return particleCount * gasConstant * temperature / vol;
+    }
+
     public void ChangeTemperature(float sliderVal)
     {
         if (particleCount == 0)
