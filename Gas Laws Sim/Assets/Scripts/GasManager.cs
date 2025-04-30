@@ -1,7 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public enum SimLockState
@@ -95,9 +95,6 @@ public class GasManager : MonoBehaviour
         volumeText.text = $"Volume: {volume:0.00} mL";
         pressureText.text = particleCount != 0 ? $"Pressure: {pressure:0.00} kPa" : "Pressure: ---";
         tempText.text = particleCount != 0 ? $"Temperature: {temperature:0.00} K" : "Temperature: ---";
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-            DestroyAllParticles();
     }
 
     public float CalculateVolume(float temp)
@@ -165,12 +162,9 @@ public class GasManager : MonoBehaviour
         particleCount += numParticles;
     }
 
-    public void DestroyAllParticles()
+    public void SimulationReset()
     {
-        GasParticle[] particles = FindObjectsByType<GasParticle>(FindObjectsSortMode.None);
-        foreach (GasParticle particle in particles)
-            Destroy(particle.gameObject);
-        particleCount = 0;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void SetLockStateInt(int lockState)

@@ -138,6 +138,9 @@ public class GraphManager : MonoBehaviour
     public void ClearData()
     {
         data.Clear();
+        ClearGraph();
+        foreach (Transform child in table)
+            Destroy(child.gameObject);
     }
 
     public void RenderLine()
