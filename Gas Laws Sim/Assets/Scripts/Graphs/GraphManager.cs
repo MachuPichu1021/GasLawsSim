@@ -48,7 +48,9 @@ public class GraphManager : MonoBehaviour
 
     private const float maxVolume = 55000;
     private const float maxTemp = 5000;
-    private const float maxPressure = 200;
+    public float MaxTemp => maxTemp;
+    private const float maxPressure = 20;
+    public float MaxPressure => maxPressure;
 
     [SerializeField] private LineRenderer lineRenderer;
     private const int numPoints = 100;

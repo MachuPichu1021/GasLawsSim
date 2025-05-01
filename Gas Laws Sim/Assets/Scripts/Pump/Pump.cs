@@ -14,7 +14,6 @@ public class Pump : MonoBehaviour
             for (int i = 0; i < 5; i++)
             {
                 Instantiate(particlePrefab, particleSpawnPos.position, Quaternion.identity, FindObjectOfType<Container>().transform);
-                GasManager.instance.IncreaseParticleCount(5);
             }
         }
     }

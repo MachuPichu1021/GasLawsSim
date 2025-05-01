@@ -13,12 +13,19 @@ public class GasParticle : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         direction = Random.insideUnitCircle.normalized;
         rb.velocity = direction * speed;
+        GasManager.instance.IncreaseParticleCount(1);
     }
 
     private void Update()
     {
         if (GasManager.instance.Temperature != 0)
             rb.velocity = 0.01f * GasManager.instance.Temperature * rb.velocity.normalized;
+
+        if (Mathf.Abs(transform.position.x) > 9.5f || Mathf.Abs(transform.position.y) > 5)
+        {
+            GasManager.instance.IncreaseParticleCount(-1);
+            Destroy(gameObject);
+        }
     }
 
     public void Freeze()

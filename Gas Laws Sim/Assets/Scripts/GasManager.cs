@@ -28,7 +28,7 @@ public class GasManager : MonoBehaviour
     private bool absoluteZero;
 
     private const float gasConstant = 8.314f;
-    private int particleCount = 0;
+    private int particleCount;
 
     [SerializeField] private TMP_Text volumeText;
     [SerializeField] private TMP_Text pressureText;
@@ -70,6 +70,9 @@ public class GasManager : MonoBehaviour
 
     private void Update()
     {
+        if (pressure > GraphManager.instance.MaxPressure || temperature > GraphManager.instance.MaxTemp)
+            SimulationReset();
+
         lockTempButton.interactable = particleCount != 0;
         lockPressureWRTVolButton.interactable = particleCount != 0;
         lockPressureWRTTempButton.interactable = particleCount != 0;
@@ -160,6 +163,7 @@ public class GasManager : MonoBehaviour
     public void IncreaseParticleCount(int numParticles)
     {
         particleCount += numParticles;
+        print(particleCount);
     }
 
     public void SimulationReset()
