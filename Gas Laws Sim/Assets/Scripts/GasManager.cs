@@ -70,7 +70,7 @@ public class GasManager : MonoBehaviour
 
     private void Update()
     {
-        if (pressure > GraphManager.instance.MaxPressure || temperature > GraphManager.instance.MaxTemp)
+        if (pressure > GraphManager.instance.MaxPressure || temperature > GraphManager.instance.MaxTemp /*|| volume > GraphManager.instance.MaxVolume*/)
             SimulationReset();
 
         lockTempButton.interactable = particleCount != 0;
@@ -88,11 +88,6 @@ public class GasManager : MonoBehaviour
             volume = 1000 * Mathf.Abs(container.LeftWall.transform.position.x - container.RightWall.transform.position.x) *
                 Mathf.Abs(container.TopWall.transform.position.y - container.BottomWall.transform.position.y);
             temperature = (pressure * volume) / (particleCount * gasConstant);
-        }
-        else if (lockState == SimLockState.PRESSURE_VOL)
-        {
-            volume = (particleCount * gasConstant * temperature) / pressure;
-            container.Resize(volume);
         }
 
         volumeText.text = $"Volume: {volume:0.00} mL";
@@ -142,6 +137,13 @@ public class GasManager : MonoBehaviour
                 UnfreezeAll();
                 absoluteZero = false;
             }
+
+            if (lockState == SimLockState.PRESSURE_VOL)
+            {
+                volume = (particleCount * gasConstant * temperature) / pressure;
+                container.Resize(volume);
+            }
+
             yield return null;
         }
     }
@@ -163,16 +165,19 @@ public class GasManager : MonoBehaviour
     public void IncreaseParticleCount(int numParticles)
     {
         particleCount += numParticles;
+
+        if (numParticles < 0)
+            pressure -= -numParticles * gasConstant * temperature / volume;
+        else if (lockState == SimLockState.PRESSURE_VOL)
+        {
+            volume = (particleCount * gasConstant * temperature) / pressure;
+            container.Resize(volume);
+        }
     }
 
     public void SimulationReset()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-
-    public void SetLockStateInt(int lockState)
-    {
-        SetLockState((SimLockState) lockState);
     }
 
     private void SetLockState(SimLockState lockState)

@@ -45,7 +45,8 @@ public class GraphManager : MonoBehaviour
     [SerializeField] private Transform table;
     [SerializeField] private GameObject tableDataPrefab;
 
-    private const float maxVolume = 55000;
+    private const float maxVolume = 55125;
+    public float MaxVolume => maxVolume;
     private const float maxTemp = 5000;
     public float MaxTemp => maxTemp;
     private const float maxPressure = 20;

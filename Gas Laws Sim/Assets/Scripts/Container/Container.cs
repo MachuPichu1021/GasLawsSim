@@ -29,10 +29,10 @@ public class Container : MonoBehaviour
     {
         volume /= 1000;
         float width = volume / Mathf.Abs(topWall.transform.position.y - bottomWall.transform.position.y);
-        leftWall.transform.position = new Vector2(rightWall.transform.position.x - width, leftWall.transform.position.y);
-        float midpoint = (leftWall.transform.position.x + rightWall.transform.position.x) / 2;
-        topWall.transform.position = new Vector2(midpoint, topWall.transform.position.y);
-        bottomWall.transform.position = new Vector2(midpoint, bottomWall.transform.position.y);
+        leftWall.transform.localPosition = new Vector2(rightWall.transform.localPosition.x - width, leftWall.transform.localPosition.y);
+        float midpoint = (leftWall.transform.localPosition.x + rightWall.transform.localPosition.x) / 2;
+        topWall.transform.localPosition = new Vector2(midpoint, topWall.transform.localPosition.y);
+        bottomWall.transform.localPosition = new Vector2(midpoint, bottomWall.transform.localPosition.y);
         topWall.transform.localScale = new Vector2(topWall.transform.localScale.x, Mathf.Abs(midpoint) * 2 + rightWall.transform.localScale.x);
         bottomWall.transform.localScale = new Vector2(bottomWall.transform.localScale.x, Mathf.Abs(midpoint) * 2 + rightWall.transform.localScale.x);
     }
