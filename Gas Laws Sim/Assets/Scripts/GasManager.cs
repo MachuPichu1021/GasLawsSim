@@ -163,7 +163,6 @@ public class GasManager : MonoBehaviour
     public void IncreaseParticleCount(int numParticles)
     {
         particleCount += numParticles;
-        print(particleCount);
     }
 
     public void SimulationReset()

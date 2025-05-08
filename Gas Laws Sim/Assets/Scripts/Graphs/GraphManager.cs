@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.U2D;
 using TMPro;
 
 public struct DataPoint
@@ -52,7 +51,8 @@ public class GraphManager : MonoBehaviour
     private const float maxPressure = 20;
     public float MaxPressure => maxPressure;
 
-    [SerializeField] private LineRenderer lineRenderer;
+    [SerializeField] private UILineRenderer curve;
+    [SerializeField] private Button showCurveButton;
     private const int numPoints = 100;
 
     private void Awake()
@@ -65,13 +65,11 @@ public class GraphManager : MonoBehaviour
 
     private void Start()
     {
-        lineRenderer.positionCount = numPoints;
+        showCurveButton.onClick.AddListener(() => curve.gameObject.SetActive(!curve.gameObject.activeInHierarchy));
     }
 
     public void DisplayGraph()
     {
-        lineRenderer.positionCount = data.Count;
-        Vector3[] positions = new Vector3[data.Count];
         foreach (DataPoint point in data)
         {
             Point dataPoint = Instantiate(dataPointPrefab, graphBG).GetComponent<Point>();
@@ -101,6 +99,8 @@ public class GraphManager : MonoBehaviour
             buttons[1].onClick.AddListener(() => { DeletePoint(point, dataPoint); Destroy(tableData); });
             tableData.GetComponentInChildren<TMP_Text>().text = $"V: {point.Volume:0.00} mL\nT: {point.Temperature:0.00} K\nP: {point.Pressure:0.00} kPa";
         }
+        RenderCurve();
+        curve.gameObject.SetActive(false);
     }
 
     public void ClearGraph()
@@ -145,9 +145,9 @@ public class GraphManager : MonoBehaviour
             Destroy(child.gameObject);
     }
 
-    public void RenderLine()
+    public void RenderCurve()
     {
-        Vector3[] positions = new Vector3[numPoints];
+        Vector2[] positions = new Vector2[numPoints];
         for (int i = 1; i <= numPoints; i++)
         {
             float xPos = -(graphBG.rect.width / 2);
@@ -176,46 +176,6 @@ public class GraphManager : MonoBehaviour
             }
             positions[i - 1] = new Vector3(xPos, yPos);
         }
-        lineRenderer.SetPositions(positions);
-        lineRenderer.gameObject.SetActive(true);
+        curve.points = positions;
     }
-
-    /*public void SampleSplineAndRender(Spline spline)
-    {
-        lineRenderer.positionCount = numPoints;
-        Vector3[] points = new Vector3[numPoints];
-
-        for (int i = 0; i < numPoints; i++)
-        {
-            float t = (float)i / (numPoints - 1);
-            points[i] = GetPoint(spline, t);
-        }
-
-        lineRenderer.SetPositions(points);
-    }
-
-    private static Vector2 GetPoint(Spline spline, float progress)
-    {
-        int length = spline.GetPointCount();
-        int i = Mathf.Clamp(Mathf.CeilToInt((length - 1) * progress), 0, length - 1);
-
-        float t = progress * (length - 1) % 1f;
-        if (i == length - 1 && progress >= 1f)
-            t = 1;
-
-        int prevIndex = Mathf.Max(i - 1, 0);
-
-        Vector2 _p0 = new Vector2(spline.GetPosition(prevIndex).x, spline.GetPosition(prevIndex).y);
-        Vector2 _p1 = new Vector2(spline.GetPosition(i).x, spline.GetPosition(i).y);
-        Vector2 _rt = _p0 + new Vector2(spline.GetRightTangent(prevIndex).x, spline.GetRightTangent(prevIndex).y);
-        Vector2 _lt = _p1 + new Vector2(spline.GetLeftTangent(i).x, spline.GetLeftTangent(i).y);
-
-        return BezierUtility.BezierPoint(
-           new Vector2(_rt.x, _rt.y),
-           new Vector2(_p0.x, _p0.y),
-           new Vector2(_p1.x, _p1.y),
-           new Vector2(_lt.x, _lt.y),
-           t
-        );
-    }*/
 }
