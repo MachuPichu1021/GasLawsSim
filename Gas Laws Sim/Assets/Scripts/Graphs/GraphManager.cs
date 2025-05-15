@@ -12,11 +12,11 @@ public struct DataPoint
     private readonly float pressure;
     public float Pressure => pressure;
 
-    public DataPoint(float _volume, float _temp, float _pressure)
+    public DataPoint(float v, float t, float p)
     {
-        volume = _volume;
-        temperature = _temp;
-        pressure = _pressure;
+        volume = v;
+        temperature = t;
+        pressure = p;
     }
 
     public bool Equals(DataPoint other)
@@ -45,7 +45,7 @@ public class GraphManager : MonoBehaviour
     [SerializeField] private Transform table;
     [SerializeField] private GameObject tableDataPrefab;
 
-    private const float maxVolume = 55125;
+    private const float maxVolume = 55150;
     public float MaxVolume => maxVolume;
     private const float maxTemp = 5000;
     public float MaxTemp => maxTemp;
@@ -67,6 +67,11 @@ public class GraphManager : MonoBehaviour
     private void Start()
     {
         showCurveButton.onClick.AddListener(() => curve.gameObject.SetActive(!curve.gameObject.activeInHierarchy));
+    }
+
+    private void Update()
+    {
+        showCurveButton.interactable = GasManager.instance.ParticleCount != 0;
     }
 
     public void DisplayGraph()
