@@ -41,11 +41,12 @@ public class GraphManager : MonoBehaviour
     [SerializeField] private GameObject dataPointPrefab;
     [SerializeField] private RectTransform graphBG;
     private GraphType graphType = GraphType.PRESSURE_VS_VOLUME;
+    public GraphType GraphType => graphType;
 
     [SerializeField] private Transform table;
     [SerializeField] private GameObject tableDataPrefab;
 
-    private const float maxVolume = 55150;
+    private const float maxVolume = 55140;
     public float MaxVolume => maxVolume;
     private const float maxTemp = 5000;
     public float MaxTemp => maxTemp;
